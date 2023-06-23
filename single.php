@@ -1,17 +1,21 @@
 <?php get_header(); ?>
 
+<?php if(have_posts()) : while(have_posts()) : the_post()?>
+
 <div class="banner__single">
     <div class="container">
         <div class="banner__top">
             <h1><?php the_title(); ?></h1>
             <ul>
                 <li><?php echo get_the_date('M j, Y') ?></li>
-                <li><?php echo get_the_author_meta('name') ?></li>
+                <li><?php echo get_the_author_meta('first_name'); ?></li>
             </ul>
         </div>
         <div class="banner__bottom">
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit eveniet voluptates labore in magni aliquam. Velit similique non provident nisi tempore quia nobis modi harum corporis excepturi optio nesciunt quo laudantium, autem voluptate tempora? Pariatur consectetur accusamus in est at?</p>
-            <img src="http://via.placeholder.com/600x400" alt="">
+            <p><?php echo get_the_excerpt(); ?></p>
+            <?php if(has_post_thumbnail()){
+                            the_post_thumbnail();
+                        } ?>
         </div>
     </div>
 </div>
@@ -22,34 +26,114 @@
             <div class="article__info">
                 <div>
                     <h3>Category</h3>
-                    <p>Technology</p>
+                    <p> <?php echo get_the_category()[0]->name ?> </p>
                 </div>
                 <div>
                     <h3>Tags</h3>
                     <ul>
-                        <li>News</li>
-                        <li>Technology</li>
-                        <li>Science</li>
+                    <?php 
+                        $post_tags = get_the_tags();
+
+                        if ( $post_tags ) {
+                            foreach( $post_tags as $tag ) { ?>
+                                <li><?php echo $tag->name; ?></li>
+                        <?php  }
+                        }
+                    ?>
                     </ul>
                 </div>
                 <div>
                     <h3>Reading</h3>
-                    <p>10mins</p>
+                    <p><?php echo get_post_meta(get_the_ID(), 'reading_time', true) ?></p>
                 </div>
             </div>
             <div class="article__body">
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsum et animi omnis, error quod totam, cum ex quae praesentium neque nobis beatae sapiente voluptatibus a vel consectetur ducimus autem repellat fugiat suscipit rem dolorum. Unde dolorem, maiores vitae facilis praesentium voluptatem. Amet impedit nisi ullam at odit, eligendi necessitatibus eum?</p>
+                <p> <?php the_content(); ?> </p>
 
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus delectus temporibus optio quam doloremque. Perspiciatis dolores deserunt molestias ab itaque?</p>
-
-                <img src="http://via.placeholder.com/600x400" alt="">
-
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid, veniam voluptatibus quae deleniti molestiae perspiciatis consectetur repellat inventore. Ipsa, quia beatae? Iusto, obcaecati? Mollitia assumenda quidem placeat esse magnam officia ullam quas eligendi, aspernatur autem nobis adipisci omnis at magni delectus exercitationem beatae. Molestias corrupti tempora sit similique labore in quidem, doloribus voluptates vero modi. Facilis aperiam magni fuga officiis.</p>
-
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti iure maxime odio praesentium animi repudiandae quam rerum dolorum ducimus tempore.</p>
+                <ul class="single__navigation">
+                    <li> <?php previous_post_link(); ?> </li>
+                    <li><?php next_post_link(); ?></li>
+                </ul>
             </div>
         </div>
     </div>
 </article>
+
+<?php 
+        endwhile;
+        else : 
+            echo "wala author";
+        endif;
+        
+        ?>
+
+<section class="feature__single">
+    <div class="container">
+        <div class="feature__grid">
+            <div class="feature__single__sidebar">
+            <?php $cardSm = new WP_Query(array(
+                        'post_type' => 'post',
+                        'posts_per_page' => 4,
+                        'tax_query' => array(
+                            array(
+                                'taxonomy' => 'category',
+                                'field' => 'name',
+                                'terms' => 'card_sm_banner',
+                                'include_children' => false,
+                            ),
+                        ),
+                        ));
+                    ?>
+                <?php if($cardSm->have_posts()) : while($cardSm->have_posts()) : $cardSm->the_post()?>
+                <div class="feature__single__sm">
+                    <small>June 21, 2020</small>
+                    <h3>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facilis?</h3>
+                    <a href="">Read More</a>
+                </div>
+                <?php 
+                    endwhile;
+                    else : 
+                        echo "<h2 class='no-post'>syet walang post</h2>";
+                    endif;
+                    
+                    wp_reset_postdata();
+                    ?>
+            </div>
+            
+            
+                <?php $cardLg = new WP_Query(array(
+                        'post_type' => 'post',
+                        'tax_query' => array(
+                            array(
+                                'taxonomy' => 'category',
+                                'field' => 'name',
+                                'terms' => 'card_lg_banner',
+                                'include_children' => false,
+                            ),
+                        ),
+                        ));
+                    ?>
+                <?php if($cardLg->have_posts()) : while($cardLg->have_posts()) : $cardLg->the_post()?>
+                <div 
+                class="feature__single__main" style="background-image:
+                linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.9)),
+                url(<?php echo get_the_post_thumbnail_url(get_the_id()) ?>)">
+                <article>
+                    <h2> <?php the_title(); ?> </h2>
+                    <p> <?php echo wp_trim_words(get_the_excerpt(), 20) ?> </p>
+                    <a href="<?php the_permalink(); ?>">Read More</a>
+                </article>
+            </div>
+            <?php 
+                endwhile;
+                else : 
+                    echo "<h2 class='no-post'>syet walang post</h2>";
+                endif;
+                
+                wp_reset_postdata();
+            ?>
+        </div>
+    </div>
+</section>
 
 <?php get_footer(); ?>
