@@ -14,8 +14,8 @@
         <div class="banner__bottom">
             <p><?php echo get_the_excerpt(); ?></p>
             <?php if(has_post_thumbnail()){
-                            the_post_thumbnail();
-                        } ?>
+                    the_post_thumbnail();
+            } ?>
         </div>
     </div>
 </div>
